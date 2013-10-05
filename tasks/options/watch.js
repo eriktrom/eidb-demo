@@ -11,6 +11,6 @@ module.exports = {
   },
   options: {
     debounceDelay: 200,
-    livereload: Helpers.isPackageAvailable("connect-livereload")
+    livereload: 35731
   }
 };

@@ -72,7 +72,9 @@ function middleware(connect, options) {
 
   // Add livereload middlware after lock middleware if enabled
   if (Helpers.isPackageAvailable("connect-livereload")) {
-    result.splice(1,0, require("connect-livereload")());
+    result.splice(1,0, require("connect-livereload")({
+      port: 35731
+    }));
   }
 
   return result;
