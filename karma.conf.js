@@ -15,6 +15,7 @@ module.exports = function(config) {
       'vendor/handlebars/handlebars.js',
       'vendor/ember/ember.js',
       'vendor/ember-data-shim/ember-data.js',
+      'vendor/easy-index-db/src/EasyIndexDb.js',
       'assets/templates.js',
       'assets/app.js',
       'tests/tests.js',
