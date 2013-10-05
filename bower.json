@@ -6,7 +6,8 @@
     "qunit": "~1.12.0",
     "ember": "1.1.0-beta.2",
     "ember-data-shim": "1.0.0-beta.3",
-    "easy-index-db": "git://github.com/ebryn/EasyIndexedDB.git"
+    "easy-index-db": "git://github.com/ebryn/EasyIndexedDB.git",
+    "rsvp": "git://github.com/tildeio/rsvp.js.git"
   },
   "resolutions": {
     "ember": "1.1.0-beta.2"
