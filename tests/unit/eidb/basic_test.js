@@ -46,7 +46,7 @@ test("Index DB works", function() {
 
 
 asyncTest("create an object store", function() {
-  expect(2);
+  expect(4);
 
   EIDB.open("myDB", 1, function(db) {
     start();
@@ -55,7 +55,9 @@ asyncTest("create an object store", function() {
     var tx = db.transaction(["books"], "readwrite"),
         store = tx.objectStore("books");
 
-    var req = store.add({id: 1, name: "poodr"});
+    var req = store.add({id: 1, name: "poodr"}).then(function(event) {
+      store.add({id: 2, name: "angular js beginners guide"});
+    });
 
     stop();
     req.then(function(event) {
@@ -64,7 +66,14 @@ asyncTest("create an object store", function() {
 
         equal(obj.id, 1);
         equal(obj.name, "poodr");
-        db.close();
+
+        stop();
+        store.get(2).then(function(obj) {
+          start();
+          equal(obj.id, 2);
+          equal(obj.name, "angular js beginners guide");
+          db.close();
+        });
       });
     });
   });
