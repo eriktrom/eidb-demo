@@ -71,8 +71,6 @@ function ajax(url, options){
 asyncTest("something", function() {
   expect(5);
 
-
-
   function query() {
     var fakeGithub = true;
     return RSVP.Promise(function(resolve, reject) {
@@ -86,6 +84,8 @@ asyncTest("something", function() {
       }
     });
   }
+
+  var lastItemId;
 
   query().then(function(data) {
     start();
@@ -106,7 +106,6 @@ asyncTest("something", function() {
           store = tx.objectStore("events");
 
 
-      var lastItemId;
       for (var i = 0; i < data.length; i++) {
         store.add(data[i]);
         if ((i + 1) === data.length) {
@@ -125,4 +124,19 @@ asyncTest("something", function() {
       });
     });
   });
+
+  setTimeout(function() {
+    EIDB.open("myDB", 1, function(db) {
+      start();
+      ok(true, "should open the db a second time");
+
+      stop();
+      db.get("events", lastItemId).then(function(obj) {
+        start();
+        equal(obj.id, lastItemId);
+        db.close();
+      });
+    });
+  }, 0);
+
 });
