@@ -45,27 +45,27 @@ test("Index DB works", function() {
 });
 
 
-// asyncTest("create an object store", function() {
-//   expect(2);
+asyncTest("create an object store", function() {
+  expect(2);
 
-//   EIDB.open("myDB", 1, function(db) {
-//     start();
-//     var store = db.createObjectStore("books", { keyPath: "id" });
-//   }).then(function(db) {
-//     var tx = db.transaction(["books"], "readwrite"),
-//         store = tx.objectStore("books");
+  EIDB.open("myDB", 1, function(db) {
+    start();
+    var store = db.createObjectStore("books", { keyPath: "id" });
+  }).then(function(db) {
+    var tx = db.transaction(["books"], "readwrite"),
+        store = tx.objectStore("books");
 
-//     var req = store.add({id: 1, name: "poodr"}).then(function(event) {
-//       store.add({id: 2, name: "angular js beginners guide"});
-//     });
+    var req = store.add({id: 1, name: "poodr"});
 
-//     req.then(function(event) {
-//       store.get(1).then(function(obj) {
-//         start();
+    stop();
+    req.then(function(event) {
+      store.get(1).then(function(obj) {
+        start();
 
-//         equal(obj.id, 1);
-//         equal(obj.name, "poodr");
-//       });
-//     });
-//   });
-// });
+        equal(obj.id, 1);
+        equal(obj.name, "poodr");
+        db.close();
+      });
+    });
+  });
+});
