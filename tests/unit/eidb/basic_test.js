@@ -1,6 +1,6 @@
 /* global EIDB, RSVP */
 
-QUnit.config.testTimeout = 1000;
+QUnit.config.testTimeout = 4000;
 
 RSVP.configure('onerror', function(error) {
   console.log('RSVP onerror', error, error.message + '', error.stack);
@@ -44,36 +44,84 @@ test("Index DB works", function() {
   });
 });
 
+function ajax(url, options){
+  return RSVP.Promise(function(resolve, reject){
+    options.success = function(data) {
+      // console.log(data);
+      resolve(data);
+      // Ember.run(null, resolve, data);
+    };
 
-asyncTest("create an object store", function() {
-  expect(4);
+    options.error = function(jqXHR, textStatus, errorThrown) {
+      // Construct a serialization-friendly error object
+      //   This value should survive the postMessage transport used to communicate to/from cards
+      var error = {
+        type: textStatus,
+        status: jqXHR.status,
+        responseText: jqXHR.responseText,
+        headers: jqXHR.getAllResponseHeaders()
+      };
+      // Ember.run(null, reject, error);
+    };
 
-  EIDB.open("myDB", 1, function(db) {
-    start();
-    var store = db.createObjectStore("books", { keyPath: "id" });
-  }).then(function(db) {
-    var tx = db.transaction(["books"], "readwrite"),
-        store = tx.objectStore("books");
+    $.ajax(url, options);
+  });
+}
 
-    var req = store.add({id: 1, name: "poodr"}).then(function(event) {
-      store.add({id: 2, name: "angular js beginners guide"});
+asyncTest("something", function() {
+  expect(5);
+
+
+
+  function query() {
+    var fakeGithub = true;
+    return RSVP.Promise(function(resolve, reject) {
+      if (fakeGithub) {
+        resolve(window.someData);
+      } else {
+        ajax("https://api.github.com/users/trombom/events", {})
+        .then(function(data) {
+          resolve(data);
+        });
+      }
     });
+  }
+
+  query().then(function(data) {
+    start();
+    console.log("Hello", data);
+    ok(true, "yes its true");
 
     stop();
-    req.then(function(event) {
-      store.get(1).then(function(obj) {
+    EIDB.open("myDB", 1, function(db) {
+      start();
+      ok(true);
+      db.createObjectStore("events", { keyPath: "id" });
+      stop();
+    }).then(function(db) {
+      start();
+      ok(true);
+
+      var tx = db.transaction(["events"], "readwrite"),
+          store = tx.objectStore("events");
+
+
+      var lastItemId;
+      for (var i = 0; i < data.length; i++) {
+        store.add(data[i]);
+        if ((i + 1) === data.length) {
+          ok(true);
+          console.log("Last", data[i]);
+          lastItemId = data[i].id;
+        }
+      }
+
+      stop();
+      store.get(lastItemId).then(function(item) {
         start();
-
-        equal(obj.id, 1);
-        equal(obj.name, "poodr");
-
-        stop();
-        store.get(2).then(function(obj) {
-          start();
-          equal(obj.id, 2);
-          equal(obj.name, "angular js beginners guide");
-          db.close();
-        });
+        equal(item.id, lastItemId);
+        console.log("Last, again", item);
+        db.close();
       });
     });
   });
